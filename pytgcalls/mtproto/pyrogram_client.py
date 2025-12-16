@@ -210,7 +210,14 @@ class PyrogramClient(BridgedClient):
                 update,
                 UpdateGroupCall,
             ):
-                chat_id = self.chat_id(chats[update.chat_id])
+                peer = update.call.peer
+                if isinstance(peer, PeerChannel):
+                    chat_id = -100 * peer.channel_id
+                elif isinstance(peer, PeerChat):
+                    chat_id = -peer.chat_id
+                else:
+                    raise ContinuePropagation()
+                    
                 if isinstance(
                     update.call,
                     GroupCall,
